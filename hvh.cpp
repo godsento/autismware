@@ -664,17 +664,16 @@ void HVH::DoRealAntiAim() {
 		static int negative = false;
 
 		// check if we will have a lby fake this tick.
-		if (!g_cl.m_lag && g_csgo.m_globals->m_curtime >= g_cl.m_body_pred && (stand || air) && !g_input.GetKeyState(g_menu.main.movement.fakewalk.get())) {
+		if (!g_cl.m_lag && g_csgo.m_globals->m_curtime >= g_cl.m_body_pred && (stand || air)) {
 			// there will be an lbyt update on this tick.
-			if (g_menu.main.antiaim.body_fake_stand_fakewalk.get()) {
 				if (stand) {
 					switch (g_menu.main.antiaim.body_fake_stand.get()) {
 
-						// z.
+						// break logic.
 					case 1:
-						g_cl.m_cmd->m_view_angles.y += 90.f;
-						//if (g_menu.main.antiaim.pitch_fake_stand.get())
-							//	g_cl.m_cmd->m_view_angles.x = -89.f;
+						g_cl.m_cmd->m_view_angles.y += 110.f;
+						negative ? g_cl.m_cmd->m_view_angles.y += 110.f : g_cl.m_cmd->m_view_angles.y -= 130.f;
+						negative = !negative;
 						break;
 
 						// random.
@@ -707,6 +706,7 @@ void HVH::DoRealAntiAim() {
 						//if (g_menu.main.antiaim.pitch_fake_stand.get())
 							//	g_cl.m_cmd->m_view_angles.x = -89.f;
 						break;
+
 					}
 				}
 
@@ -734,7 +734,6 @@ void HVH::DoRealAntiAim() {
 						break;
 					}
 				}
-			}
 		}
 
 		// run normal aa code.
@@ -1173,7 +1172,7 @@ void HVH::SendPacket() {
 				}
 
 				//lby update
-				else if (*it == 4 && g_csgo.m_globals->m_curtime + 0.3 >= g_cl.m_body_pred && g_cl.m_speed < 0.1f) {
+				else if (*it == 4 && g_csgo.m_globals->m_curtime + 0.3 >= g_cl.m_body_pred) {
 					active = true;
 					break;
 				}

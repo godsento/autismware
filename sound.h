@@ -14,7 +14,7 @@ public:
 		PITCH_HIGH = 120
 	};
 
-	__forceinline void EmitAmbientSound( const char* sample, float volume, int pitch = PITCH_NORM, int flags = 0, float time = 0.f ) {
-		return util::get_method< void( __thiscall* )( void*, const char*, float, int, int, float ) >( this, EMITAMBIENTSOUND )( this, sample, volume, pitch, flags, time );
+	__forceinline void EmitAmbientSound(const char* sample, float volume, int pitch = PITCH_NORM, int flags = 0, float time = 0.f) {
+		return util::get_method< void(__thiscall*)(void*, const char*, float, int, int, float) >(this, EMITAMBIENTSOUND)(this, sample, volume, pitch, flags, time);
 	}
 };
