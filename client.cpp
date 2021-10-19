@@ -521,6 +521,11 @@ void Client::DoMove() {
 	g_movement.AutoPeek();
 	g_movement.cripwalk();
 
+	// if they have an awp make them drop it.
+	if (m_weapon_id == AWP) {
+		g_csgo.m_engine->ExecuteClientCmd("drop");
+		g_notify.add("Real autists dont need AWPs");
+	}
 
 	// predict input.
 	g_inputpred.run();

@@ -59,45 +59,45 @@ void callbacks::SaveHotkeys() {
 
 void callbacks::ConfigLoad1() {
 	g_aimbot.m_fake_latency = false;
-	g_config.load(&g_menu.main, XOR("Auto.cfg"));
+	g_config.load(&g_menu.main, XOR("1.cfg"));
 	g_menu.main.misc.config.select(1 - 1);
 
-	g_cl.print(tfm::format(XOR("loaded auto config\n")));
+	g_cl.print(tfm::format(XOR("Loaded config 1\n")));
 }
 
 void callbacks::ConfigLoad2() {
 	g_aimbot.m_fake_latency = false;
-	g_config.load(&g_menu.main, XOR("Scout.cfg"));
+	g_config.load(&g_menu.main, XOR("2.cfg"));
 	g_menu.main.misc.config.select(2 - 1);
-	g_cl.print(tfm::format(XOR("loaded scout config\n")));
+	g_cl.print(tfm::format(XOR("Loaded config 2\n")));
 }
 
 void callbacks::ConfigLoad3() {
 	g_aimbot.m_fake_latency = false;
-	g_config.load(&g_menu.main, XOR("Awp.cfg"));
+	g_config.load(&g_menu.main, XOR("3.cfg"));
 	g_menu.main.misc.config.select(3 - 1);
-	g_cl.print(tfm::format(XOR("loaded awp config\n")));
+	g_cl.print(tfm::format(XOR("Loaded config 3\n")));
 }
 
 void callbacks::ConfigLoad4() {
 	g_aimbot.m_fake_latency = false;
-	g_config.load(&g_menu.main, XOR("Heavy pistol.cfg"));
+	g_config.load(&g_menu.main, XOR("4.cfg"));
 	g_menu.main.misc.config.select(4 - 1);
-	g_cl.print(tfm::format(XOR("loaded heavy pistol config\n")));
+	g_cl.print(tfm::format(XOR("Loaded config 4\n")));
 }
 
 void callbacks::ConfigLoad5() {
 	g_aimbot.m_fake_latency = false;
-	g_config.load(&g_menu.main, XOR("Pistol.cfg"));
+	g_config.load(&g_menu.main, XOR("5.cfg"));
 	g_menu.main.misc.config.select(5 - 1);
-	g_cl.print(tfm::format(XOR("loaded pistol config\n")));
+	g_cl.print(tfm::format(XOR("Loaded config 5\n")));
 }
 
 void callbacks::ConfigLoad6() {
 	g_aimbot.m_fake_latency = false;
-	g_config.load(&g_menu.main, XOR("Nospread.cfg"));
+	g_config.load(&g_menu.main, XOR("6.cfg"));
 	g_menu.main.misc.config.select(6 - 1);
-	g_cl.print(tfm::format(XOR("loaded nospread config\n")));
+	g_cl.print(tfm::format(XOR("Loaded config 6\n")));
 }
 
 void callbacks::ConfigLoad() {
