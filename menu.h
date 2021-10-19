@@ -661,12 +661,7 @@ public:
 		pitch_fake_stand.AddShowCallback(callbacks::HasStandYaw);
 		RegisterElement(&pitch_fake_stand);*/
 
-		body_fake_stand_fakewalk.setup(XOR("Disbale Lby flick while fakewalking"), XOR("body_fake_stand_fakewalk"));
-		body_fake_stand_fakewalk.AddShowCallback(callbacks::IsAntiAimModeStand);
-		body_fake_stand_fakewalk.AddShowCallback(callbacks::HasStandYaw);
-		RegisterElement(&body_fake_stand_fakewalk);
-
-		body_fake_stand.setup(XOR("fake body"), XOR("body_fake_stnd"), { XOR("off"), XOR("z"), XOR("random"), XOR("twist"), XOR("autistic"), XOR("custom") });
+		body_fake_stand.setup(XOR("fake body"), XOR("body_fake_stnd"), { XOR("off"), XOR("break logic"), XOR("random"), XOR("twist"), XOR("autistic"), XOR("custom") });
 		body_fake_stand.AddShowCallback(callbacks::IsAntiAimModeStand);
 		body_fake_stand.AddShowCallback(callbacks::HasStandYaw);
 		RegisterElement(&body_fake_stand);
@@ -809,7 +804,7 @@ public:
 		lag_enable.setup(XOR("fake-lag"), XOR("lag_enable"));
 		RegisterElement(&lag_enable, 1);
 
-		lag_active.setup("", XOR("lag_active"), { XOR("stand"), XOR("move"), XOR("air"), XOR("crouch"), XOR("lby flick"), XOR("reloading"), XOR("velocity change"), XOR("weapom switch"), XOR("always") }, false);
+		lag_active.setup("", XOR("lag_active"), { XOR("stand"), XOR("move"), XOR("air"), XOR("crouch"), XOR("lby flick"), XOR("reloading"), XOR("velocity change"), XOR("weapon switch"), XOR("always") }, false);
 		RegisterElement(&lag_active, 1);
 
 		lag_mode.setup("", XOR("lag_mode"), { XOR("max"), XOR("break"), XOR("random"), XOR("break step") }, false);
@@ -846,6 +841,7 @@ public:
 		backward.setup(XOR("Backward"), XOR("backward"));
 		backward.SetToggleCallback(callbacks::ToggleBack);
 		RegisterElement(&backward, 1);
+
 	}
 };
 
@@ -1297,7 +1293,7 @@ public:
 		pen_damage.setup(XOR("Penetration damage"), XOR("pen_damage"));
 		RegisterElement(&pen_damage, 1);
 
-		indicators.setup(XOR("Indicators"), XOR("indicators"), { XOR("Lby"), XOR("Lag compensation"), XOR("Ping"), XOR("Doubletap")});
+		indicators.setup(XOR("Indicators"), XOR("indicators"), { XOR("Lby"), XOR("Lag compensation"), XOR("Ping"), XOR("Doubletap"), XOR("Bomb")});
 		RegisterElement(&indicators, 1);
 
 		tracers.setup(XOR("Grenade simulation"), XOR("tracers"));
@@ -1315,7 +1311,7 @@ public:
 		impact_beams_hurt_color.setup(XOR("Hit color"), XOR("impact_beams_hurt_color"), colors::red);
 		RegisterElement(&impact_beams_hurt_color, 1);
 
-		impact_beams_time.setup(XOR("Impact beams time"), XOR("impact_beams_time"), 1.f, 10.f, true, 0, 1.f, 1.f, XOR(L""));
+		impact_beams_time.setup(XOR("Impact beams thickness"), XOR("impact_beams_time"), 1.f, 10.f, true, 0, 1.f, 1.f, XOR(L""));
 		RegisterElement(&impact_beams_time, 1);
 
 		thirdperson.setup(XOR("Thirdperson"), XOR("thirdperson"));
@@ -2624,10 +2620,6 @@ public:
 		menu_color.setup(XOR("Menu color"), XOR("menu_color"), colors::burgundy, &g_gui.m_color);
 		RegisterElement(&menu_color);
 
-		
-
-		mode.setup(XOR("Modes"), XOR("mode"), { XOR("matchmaking"), XOR("no-spread") });
-		RegisterElement(&mode, 1);
 
 		config.setup(XOR("Cfg"), XOR("cfg"), { XOR("1"), XOR("2"), XOR("3"), XOR("4"), XOR("5") });
 		config.RemoveFlags(ElementFlags::SAVE);
