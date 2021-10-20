@@ -152,7 +152,6 @@ void Hooks::init() {
 	m_surface.add(ISurface::LOCKCURSOR, util::force_cast(&Hooks::LockCursor));
 	m_surface.add(ISurface::ONSCREENSIZECHANGED, util::force_cast(&Hooks::OnScreenSizeChanged));
 
-	m_engine_sound.init(g_csgo.m_sound);
 
 	m_model_render.init(g_csgo.m_model_render);
 	m_model_render.add(IVModelRender::DRAWMODELEXECUTE, util::force_cast(&Hooks::DrawModelExecute));
