@@ -180,8 +180,8 @@ void Shots::OnImpact(IGameEvent* evt) {
 	g_csgo.m_engine_trace->ClipRayToEntity(Ray(start, end), MASK_SHOT, target, &trace);
 
 	// we did not hit jackshit, or someone else.
-	if (!trace.m_entity || !trace.m_entity->IsPlayer() || trace.m_entity != target){
-		std::string out = tfm::format(XOR("Missed shot due to spread\n"));
+	if (!trace.m_entity || !trace.m_entity->IsPlayer()){
+		std::string out = tfm::format(XOR("Missed shot due to bad resolve\n"));
 	
 			g_notify.add(out, colors::red);
 		}
