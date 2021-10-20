@@ -1172,7 +1172,7 @@ void HVH::SendPacket() {
 				}
 
 				//lby update
-				else if (*it == 4 && g_csgo.m_globals->m_curtime + 0.3 >= g_cl.m_body_pred) {
+				else if (*it == 4 && g_csgo.m_globals->m_curtime + 0.3 >= g_cl.m_body_pred && g_cl.m_speed < 0.1f) {
 					active = true;
 					break;
 				}
