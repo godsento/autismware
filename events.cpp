@@ -147,26 +147,12 @@ void events::player_hurt(IGameEvent* evt) {
 			float damage = evt->m_keys->FindKey(HASH("dmg_health"))->GetInt();
 			int hp = evt->m_keys->FindKey(HASH("health"))->GetInt();
 
-			
+			g_notify.add(tfm::format(XOR("Got hit by %s in the %s for %i damage (%i health remaining)\n"), name, g_shots.m_groups[evt->m_keys->FindKey(HASH("hitgroup"))->GetInt()], damage, hp));
 		}
 
 		// a player damaged the local player.
 		if (attacker->index() > 0 && attacker->index() < 64 && victim == g_cl.m_local)
 			g_visuals.m_offscreen_damage[attacker->index()] = { 3.f, 0.f, colors::red };
-	}
-
-	Entity* hurt_c = (Entity*)g_csgo.m_entlist->GetClientEntity(g_csgo.m_engine->GetPlayerForUserID(evt->m_keys->FindKey(HASH("userid"))->GetInt()));
-	Entity* attacker_c = (Entity*)g_csgo.m_entlist->GetClientEntity(g_csgo.m_engine->GetPlayerForUserID(evt->m_keys->FindKey(HASH("attacker"))->GetInt()));
-
-	if (hurt_c != g_cl.m_local && attacker_c == g_cl.m_local)
-	{
-		DamageIndicator_t DmgIndicator;
-		DmgIndicator.iDamage = evt->m_keys->FindKey(HASH("dmg_health"))->GetInt();
-		DmgIndicator.Player = hurt_c;
-		DmgIndicator.flEraseTime = g_cl.m_local->m_nTickBase() * g_csgo.m_globals->m_interval + 2.0f;
-		DmgIndicator.bInitialized = false;
-
-		g_cl.DamageIndicator.push_back(DmgIndicator);
 	}
 }
 
@@ -199,7 +185,7 @@ void events::item_purchase(IGameEvent* evt) {
 		return;
 
 	std::string out = tfm::format(XOR("%s bought %s\n"), std::string{ info.m_name }.substr(0, 24), weapon);
-	g_notify.add(out);
+	g_notify.add(out, colors::green);
 }
 
 void events::player_death(IGameEvent* evt) {
