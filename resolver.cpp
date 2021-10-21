@@ -345,36 +345,8 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record) {
 	}
 }
 
-bool Resolver::Spin_Detection(AimPlayer* data) {
 
-	if (data->m_records.empty())
-		return false;
 
-	spin_step = 0;
-
-	size_t size{};
-
-	// iterate records.
-	for (const auto& it : data->m_records) {
-		if (it->dormant())
-			break;
-
-		// increment total amount of data.
-		++size;
-	}
-
-	if (size > 2) {
-		LagRecord* record = data->m_records[0].get();
-
-		spindelta = (record->m_body - data->m_records[1].get()->m_body) / data->m_records[1].get()->m_lag;
-		spinbody = record->m_body;
-		float delta2 = (data->m_records[1].get()->m_body - data->m_records[2].get()->m_body) / data->m_records[2].get()->m_lag;
-
-		return spindelta == delta2 && spindelta > 0.5f;
-	}
-	else
-		return false;
-}
 
 void Resolver::ResolveAir(AimPlayer* data, LagRecord* record) {
 
