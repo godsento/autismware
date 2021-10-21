@@ -2611,8 +2611,12 @@ public:
 		last_tick_defuse.setup(XOR("Last second defuse"), XOR("last_tick_defuse"));
 		RegisterElement(&last_tick_defuse);
 
-		fake_latency_always.setup(XOR("Ping spike always"), XOR("fake_latency_always"));
-		RegisterElement(&fake_latency_always);
+		fake_latency.setup(XOR("Ping spike"), XOR("fake_latency"));
+		fake_latency.SetToggleCallback(callbacks::ToggleFakeLatency);
+		RegisterElement(&fake_latency);
+
+		fake_latency_amt.setup("", XOR("fake_latency_amt"), 50.f, 1000.f, false, 0, 200.f, 50.f, XOR(L"ms"));
+		RegisterElement(&fake_latency_amt);
 
 		void init();
 		SetTitle(XOR("Misc"));
@@ -2675,12 +2679,8 @@ public:
 		load.SetCallback(callbacks::ConfigLoad);
 		RegisterElement(&load, 1);
 
-		fake_latency.setup(XOR("Ping spike"), XOR("fake_latency"));
-		fake_latency.SetToggleCallback(callbacks::ToggleFakeLatency);
-		RegisterElement(&fake_latency);
+		
 
-		fake_latency_amt.setup("", XOR("fake_latency_amt"), 50.f, 1000.f, false, 0, 200.f, 50.f, XOR(L"ms"));
-		RegisterElement(&fake_latency_amt);
 
 		// col2.
 		skyboxchange.setup(XOR("Skybox changer"), XOR("skyboxchange"));
