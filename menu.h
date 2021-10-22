@@ -78,7 +78,7 @@ public:
 	Checkbox      zoom;
 	Checkbox      nospread;
 	Checkbox      norecoil;
-
+	Keybind       head_key;
 	Checkbox      hitchance_general;
 	Slider	      hitchance_amount_general;
 
@@ -480,7 +480,8 @@ public:
 		baim_key.setup(XOR("Force body aim"), XOR("body aim on key"));
 		RegisterElement(&baim_key, 1);
 
-
+		//head_key.setup(XOR("Force head aim"), XOR("head aim on key"));
+		//RegisterElement(&head_key, 1);
 
 
 
@@ -830,6 +831,18 @@ public:
 		color_manul_antiaim.setup(XOR("Manual anti-aim color"), XOR("color_manul_antiaim"), colors::burgundy);
 		RegisterElement(&color_manul_antiaim, 1);
 
+		draw_angles.setup(XOR("Draw angles"), XOR("draw_angles"));
+		RegisterElement(&draw_angles, 1);
+
+		draw_angles_chams.setup(XOR("Draw fake chams"), XOR("draw_angles_chams"));
+		RegisterElement(&draw_angles_chams, 1);
+
+		color_draw_angles_chams.setup(XOR("Fake chams color"), XOR("color_draw_angles_chams"), colors::purple);
+		RegisterElement(&color_draw_angles_chams, 1);
+
+		draw_angles_chams_blend.setup("", XOR("draw_angles_chams_blend"), 10.f, 100.f, false, 0, 50.f, 1.f, XOR(L"%"));
+		RegisterElement(&draw_angles_chams_blend, 1);
+
 		left.setup(XOR("Left"), XOR("left"));
 		left.SetToggleCallback(callbacks::ToggleLeft);
 		RegisterElement(&left, 1);
@@ -1000,7 +1013,7 @@ public:
 		RegisterElement(&glow_blend, 1);
 
 		// chams selection.
-		chams_selection.setup(XOR("Cham options"), XOR("chams_selection"), { XOR("enemy"), XOR("friendly"), XOR("local"), XOR("fake yaw") });
+		chams_selection.setup(XOR("Cham options"), XOR("chams_selection"), { XOR("enemy"), XOR("friendly"), XOR("local")});
 		RegisterElement(&chams_selection, 1);
 
 		// enemy chams.
