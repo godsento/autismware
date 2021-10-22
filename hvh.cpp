@@ -905,6 +905,7 @@ void HVH::Distort() {
 	static float flLastMoveYaw = FLT_MAX;
 	static bool bGenerate = true;
 	static float flGenerated = 0.f;
+	auto distortdelta = g_menu.main.antiaim.distortdelta.get();
 
 	if (g_cl.m_speed > 5.f && g_cl.m_ground && !g_input.GetKeyState(g_menu.main.movement.fakewalk.get())) {
 		flLastMoveTime = g_csgo.m_globals->m_realtime;
@@ -925,15 +926,11 @@ void HVH::Distort() {
 	}
 
 	if (bDoDistort) {
-		// don't distort for longer than this
-		if (fabs(g_csgo.m_globals->m_realtime - flLastMoveTime) > 10.f && 10.f > 0.f) {
-			return;
-		}
 
 		if (true) {
-			float flDistortion = std::sin((g_csgo.m_globals->m_realtime * 15.f) * 0.5f + 0.5f);
+			float flDistortion = std::sin((g_csgo.m_globals->m_realtime * 10.f) * 0.5f + 0.5f);
 
-			g_cl.m_cmd->m_view_angles.y -= 58.f * flDistortion;
+			g_cl.m_cmd->m_view_angles.y += distortdelta * flDistortion;
 			return;
 		}
 
