@@ -407,7 +407,7 @@ void AimPlayer::SetupHitboxes(LagRecord* record, bool history) {
 
 	if (g_cl.m_weapon_id == ZEUS) {
 		// hitboxes for the zeus.
-		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
+		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::NORMAL });
 		return;
 	}
 
@@ -431,7 +431,7 @@ void AimPlayer::SetupHitboxes(LagRecord* record, bool history) {
 	if (g_menu.main.aimbot.baim1.get(4) && !(record->m_pred_flags & FL_ONGROUND))
 		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
 
-	// prefer, in air.
+	// prefer, after x misses.
 	if (g_menu.main.aimbot.baim1.get(5) && (m_moving_index >= g_menu.main.aimbot.misses.get() || m_unknown_move >= g_menu.main.aimbot.misses.get()))
 		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
 
@@ -440,35 +440,44 @@ void AimPlayer::SetupHitboxes(LagRecord* record, bool history) {
 	// only, always.
 	if (g_menu.main.aimbot.baim2.get(0)) {
 		only = true;
-		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
+		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::NORMAL });
 	}
 
 	// only, health.
 	if (g_menu.main.aimbot.baim2.get(1) && m_player->m_iHealth() <= (int)g_menu.main.aimbot.baim_hp.get()) {
 		only = true;
-		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
+		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::NORMAL });
 	}
 
 	// only, fake.
 	if (g_menu.main.aimbot.baim2.get(2) && record->m_mode != Resolver::Modes::RESOLVE_NONE && record->m_mode != Resolver::Modes::RESOLVE_WALK) {
 		only = true;
-		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
+		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::NORMAL });
 	}
 
 	// only, in air.
 	if (g_menu.main.aimbot.baim2.get(3) && !(record->m_pred_flags & FL_ONGROUND)) {
 		only = true;
-		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
+		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::NORMAL });
 	}
 
-	// only, in air.
+	// only, after x misses.
 	if (g_menu.main.aimbot.baim2.get(4) && (m_moving_index >= g_menu.main.aimbot.misses.get() || m_unknown_move >= g_menu.main.aimbot.misses.get())) {
 		only = true;
-		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::PREFER });
+		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::NORMAL });
 	}
 
 	// only, on key.
+	if (g_input.GetKeyState(g_menu.main.aimbot.baim_key.get())) {
+		only = true;
+		m_hitboxes.push_back({ HITBOX_BODY, HitscanMode::NORMAL });
+	}
 
+	// only head, on key.
+	if (g_input.GetKeyState(g_menu.main.aimbot.head_key.get())) {
+		only = true;
+		m_hitboxes.push_back({ HITBOX_HEAD, HitscanMode::NORMAL });
+	}
 
 
 	// only baim conditions have been met.
