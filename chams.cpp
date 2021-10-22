@@ -132,18 +132,7 @@ void Chams::init() {
 	ghost->IncrementReferenceCount();
 }
 
-void Chams::RenderFake() {
-	if (g_menu.main.antiaim.draw_angles_chams.get()) { // check if active
-		if (g_cl.m_local) {
-			//g_csgo.m_render_view->SetBlend(g_menu.main.antiaim.draw_angles_chams_blend.get() / 100.f);
-			SetAlpha(g_menu.main.antiaim.draw_angles_chams_blend.get() / 100.f);
-			SetupMaterial(debugdrawflat, g_menu.main.antiaim.color_draw_angles_chams.get(), false, g_menu.main.players.chams_enemy_history_wireframe.get());
-			ang_t fake1337(0, g_cl.m_radar.y, 0);
-			g_cl.m_local->SetAbsAngles(fake1337);
-			g_cl.m_local->DrawModel();
-		}
-	}
-}
+
 
 bool Chams::OverridePlayer(int index) {
 	Player* player = g_csgo.m_entlist->GetClientEntity< Player* >(index);
@@ -337,14 +326,29 @@ void Chams::SceneEnd() {
 	// store and sort ents by distance.
 	if (SortPlayers()) {
 		// iterate each player and render them.
-		for (const auto& p : m_players)
+		for (const auto& p : m_players) {
 			RenderPlayer(p);
+		}
+		RenderFake();
 	}
 
 	// restore.
 	g_csgo.m_studio_render->ForcedMaterialOverride(nullptr);
 	g_csgo.m_render_view->SetColorModulation(colors::white);
 	g_csgo.m_render_view->SetBlend(1.f);
+}
+
+void Chams::RenderFake() {
+	if (g_menu.main.antiaim.draw_angles_chams.get()) { // check if active
+		if (g_cl.m_local) {
+			//g_csgo.m_render_view->SetBlend(g_menu.main.antiaim.draw_angles_chams_blend.get() / 100.f);
+			SetAlpha(g_menu.main.antiaim.draw_angles_chams_blend.get() / 100.f);
+			SetupMaterial(debugdrawflat, g_menu.main.antiaim.color_draw_angles_chams.get(), false, g_menu.main.players.chams_enemy_history_wireframe.get());
+			ang_t fake1337(0, g_cl.m_radar.y, 0);
+			g_cl.m_local->SetAbsAngles(fake1337);
+			g_cl.m_local->DrawModel();
+		}
+	}
 }
 
 void Chams::RenderPlayer(Player* player) {
