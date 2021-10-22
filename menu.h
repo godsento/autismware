@@ -518,6 +518,7 @@ public:
 	Checkbox enable;
 	Checkbox edge;
 	Checkbox distortion;
+	Slider   distortdelta;
 	Dropdown mode;
 
 	Dropdown pitch_stand;
@@ -596,6 +597,9 @@ public:
 		distortion.setup(XOR("Distortion"), XOR("distortion"));
 		RegisterElement(&distortion);
 
+		distortdelta.setup(XOR("Distortion delta"), XOR("distortdelta"), 35.f, 240.f, true, 0, 75.f, 5.f, XOR(L"°"));
+		RegisterElement(&distortdelta);
+
 		mode.setup("", XOR("Mode"), { XOR("Stand"), XOR("Walk"), XOR("Air") }, false);
 		RegisterElement(&mode);
 
@@ -662,7 +666,7 @@ public:
 		pitch_fake_stand.AddShowCallback(callbacks::HasStandYaw);
 		RegisterElement(&pitch_fake_stand);*/
 
-		body_fake_stand.setup(XOR("fake body"), XOR("body_fake_stnd"), { XOR("off"), XOR("break logic"), XOR("random"), XOR("twist"), XOR("autistic"), XOR("custom") });
+		body_fake_stand.setup(XOR("Fake body"), XOR("body_fake_stnd"), { XOR("off"), XOR("break logic"), XOR("random"), XOR("twist"), XOR("autistic"), XOR("custom") });
 		body_fake_stand.AddShowCallback(callbacks::IsAntiAimModeStand);
 		body_fake_stand.AddShowCallback(callbacks::HasStandYaw);
 		RegisterElement(&body_fake_stand);
@@ -790,7 +794,7 @@ public:
 
 
 		// col2.
-		fake_yaw.setup(XOR("fake yaw"), XOR("fake_yaw"), { XOR("off"), XOR("default"), XOR("relative"), XOR("jitter"), XOR("rotate"), XOR("random"), XOR("local view"), XOR("spin"), XOR("breaker 90"), XOR("rotate break") });
+		fake_yaw.setup(XOR("Fake yaw"), XOR("fake_yaw"), { XOR("off"), XOR("default"), XOR("relative"), XOR("jitter"), XOR("rotate"), XOR("random"), XOR("local view"), XOR("spin"), XOR("breaker 90"), XOR("rotate break") });
 		RegisterElement(&fake_yaw, 1);
 
 		fake_relative.setup("", XOR("fake_relative"), -90.f, 90.f, false, 0, 0.f, 5.f, XOR(L"°"));
@@ -802,7 +806,7 @@ public:
 		RegisterElement(&fake_jitter_range, 1);
 
 		// col 2.
-		lag_enable.setup(XOR("fake-lag"), XOR("lag_enable"));
+		lag_enable.setup(XOR("Fake-lag"), XOR("lag_enable"));
 		RegisterElement(&lag_enable, 1);
 
 		lag_active.setup("", XOR("lag_active"), { XOR("stand"), XOR("move"), XOR("air"), XOR("crouch"), XOR("lby flick"), XOR("reloading"), XOR("velocity change"), XOR("weapon switch"), XOR("always") }, false);
@@ -811,7 +815,7 @@ public:
 		lag_mode.setup("", XOR("lag_mode"), { XOR("max"), XOR("break"), XOR("random"), XOR("break step") }, false);
 		RegisterElement(&lag_mode, 1);
 
-		lag_limit.setup(XOR("limit"), XOR("lag_limit"), 2, 17, true, 0, 2, 1.f);
+		lag_limit.setup(XOR("Limit"), XOR("lag_limit"), 2, 17, true, 0, 2, 1.f);
 		RegisterElement(&lag_limit, 1);
 
 		disablefakelagonkey.setup(XOR("No Fake-Lag"), XOR("disable fake-lag on key"));
@@ -1632,12 +1636,12 @@ public:
 	void init() {
 		SetTitle(XOR("Skin changer"));
 
-		enable.setup(XOR("enable"), XOR("skins_enable"));
+		enable.setup(XOR("Enable"), XOR("skins_enable"));
 		enable.SetCallback(callbacks::ForceFullUpdate);
 		RegisterElement(&enable);
 
 		// weapons...
-		id_deagle.setup(XOR("paintkit id"), XOR("id_deagle"), 3);
+		id_deagle.setup(XOR("Paintkit id"), XOR("id_deagle"), 3);
 		id_deagle.SetCallback(callbacks::SkinUpdate);
 		id_deagle.AddShowCallback(callbacks::DEAGLE);
 		RegisterElement(&id_deagle);
@@ -2498,15 +2502,15 @@ public:
 		RegisterElement(&seed_daggers);
 
 		// col 2.
-		knife.setup(XOR("knife model"), XOR("skins_knife_model"), { XOR("off"), XOR("bayonet"), XOR("bowie"), XOR("butterfly"), XOR("falchion"), XOR("flip"), XOR("gut"), XOR("huntsman"), XOR("karambit"), XOR("m9 bayonet"), XOR("daggers") });
+		knife.setup(XOR("Knife model"), XOR("skins_knife_model"), { XOR("off"), XOR("bayonet"), XOR("bowie"), XOR("butterfly"), XOR("falchion"), XOR("flip"), XOR("gut"), XOR("huntsman"), XOR("karambit"), XOR("m9 bayonet"), XOR("daggers") });
 		knife.SetCallback(callbacks::SkinUpdate);
 		RegisterElement(&knife, 1);
 
-		glove.setup(XOR("glove model"), XOR("skins_glove_model"), { XOR("off"), XOR("bloodhound"), XOR("sport"), XOR("driver"), XOR("handwraps"), XOR("moto"), XOR("specialist") });
+		glove.setup(XOR("Glove model"), XOR("skins_glove_model"), { XOR("off"), XOR("bloodhound"), XOR("sport"), XOR("driver"), XOR("handwraps"), XOR("moto"), XOR("specialist") });
 		glove.SetCallback(callbacks::ForceFullUpdate);
 		RegisterElement(&glove, 1);
 
-		glove_id.setup(XOR("glove paintkit id"), XOR("skins_glove_id"), 2);
+		glove_id.setup(XOR("Glove paintkit id"), XOR("skins_glove_id"), 2);
 		glove_id.SetCallback(callbacks::ForceFullUpdate);
 		RegisterElement(&glove_id, 1);
 	}
