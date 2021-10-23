@@ -71,7 +71,7 @@ public:
 	Colorpicker debugaimcol;
 	Keybind       override_dmg_key;
 	Slider        override_dmg_value;
-	Checkbox resolver_override;
+	Checkbox      override;
 
 	// col2.
 
@@ -105,7 +105,7 @@ public:
 	Slider        misses;
 	Slider        baim_hp;
 	Keybind       baim_key;
-	Keybind       override;
+	Keybind       resolver_override;
 	Keybind	      akuzytap;
 	Keybind  disablefakelagonkey2;
 
@@ -500,7 +500,8 @@ public:
 		override_dmg_value.AddShowCallback(callbacks::IsOverrideDamage);
 		RegisterElement(&override_dmg_value, 1);
 
-
+		resolver_override.setup(XOR("Override resolver"), XOR("resolver_override"));
+		RegisterElement(&resolver_override, 1);
 
 		debugaim.setup(XOR("Show shot chams"), XOR("debugaim"));
 		RegisterElement(&debugaim,1);
