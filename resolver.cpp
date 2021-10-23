@@ -119,6 +119,52 @@ void Resolver::MatchShot(AimPlayer* data, LagRecord* record) {
 	}
 }
 
+
+
+void Resolver::SetMode(LagRecord* record) {
+
+	float speed = record->m_velocity.length_2d();
+
+	if ((record->m_flags & FL_ONGROUND) && speed > 1.f && !record->m_fake_walk)
+		record->m_mode = Modes::RESOLVE_WALK;
+
+	// if on ground, not moving or fakewalking.
+	if ((record->m_flags & FL_ONGROUND) && (speed < 1.f || record->m_fake_walk) && !g_input.GetKeyState(g_menu.main.aimbot.resolver_override.get()))
+		record->m_mode = Modes::RESOLVE_STAND;
+	// override
+	if (g_input.GetKeyState(g_menu.main.aimbot.resolver_override.get()) && record->m_flags & FL_ONGROUND && (speed < 1.f || record->m_fake_walk))
+		record->m_mode = Modes::RESOLVE_OVERRIDE;
+	// if not on ground.
+	else if (!(record->m_flags & FL_ONGROUND))
+		record->m_mode = Modes::RESOLVE_AIR;
+}
+
+void Resolver::ResolveAngles(Player* player, LagRecord* record) {
+	AimPlayer* data = &g_aimbot.m_players[player->index() - 1];
+
+	// mark this record if it contains a shot.
+	MatchShot(data, record);
+
+	// next up mark this record with a resolver mode that will be used.
+	SetMode(record);
+
+	// we arrived here we can do the acutal resolve.
+	if (record->m_mode == Modes::RESOLVE_WALK)
+		ResolveWalk(data, record);
+
+	else if (record->m_mode == Modes::RESOLVE_STAND && !(g_input.GetKeyState(g_menu.main.aimbot.resolver_override.get())))
+		ResolveStand(data, record);
+
+	else if (record->m_mode == Modes::RESOLVE_OVERRIDE || (g_input.GetKeyState(g_menu.main.aimbot.resolver_override.get())))
+		ResolveOverride(player, record, data);
+
+	else if (record->m_mode == Modes::RESOLVE_AIR)
+		ResolveAir(data, record);
+
+	// normalize the eye angles, doesn't really matter but its clean.
+	math::NormalizeAngle(record->m_eye_angles.y);
+}
+
 void Resolver::AntiFreestand(LagRecord* record) {
 	// constants
 	constexpr float STEP{ 4.f };
@@ -210,48 +256,77 @@ void Resolver::AntiFreestand(LagRecord* record) {
 	record->m_eye_angles.y = best->m_yaw;
 }
 
-void Resolver::SetMode(LagRecord* record) {
+void Resolver::ResolveOverride(Player* player, LagRecord* record, AimPlayer* data) {
 
-	float speed = record->m_velocity.length_2d();
+	// get predicted away angle for the player.
+	float away = GetAwayAngle(record);
 
-	if ((record->m_flags & FL_ONGROUND) && speed > 1.f && !record->m_fake_walk)
-		record->m_mode = Modes::RESOLVE_WALK;
+	// pointer for easy access.
+	LagRecord* move = &data->m_walk_record;
 
-	// if on ground, not moving or fakewalking.
-	if ((record->m_flags & FL_ONGROUND) && (speed < 1.f || record->m_fake_walk))
-		record->m_mode = Modes::RESOLVE_STAND;
+	C_AnimationLayer* curr = &record->m_layers[3];
+	int act = data->m_player->GetSequenceActivity(curr->m_sequence);
 
-	// if not on ground.
-	else if (!(record->m_flags & FL_ONGROUND))
-		record->m_mode = Modes::RESOLVE_AIR;
-}
+	if (g_input.GetKeyState(g_menu.main.aimbot.resolver_override.get())) {
+		ang_t                          viewangles;
+		g_csgo.m_engine->GetViewAngles(viewangles);
 
-void Resolver::ResolveAngles(Player* player, LagRecord* record) {
-	AimPlayer* data = &g_aimbot.m_players[player->index() - 1];
+		//auto yaw = math::clamp (g_cl.m_local->GetAbsOrigin(), Player->origin()).y;
+		const float at_target_yaw = math::CalcAngle(g_cl.m_local->m_vecOrigin(), player->m_vecOrigin()).y;
 
-	// mark this record if it contains a shot.
-	MatchShot(data, record);
+		if (fabs(math::NormalizedAngle(viewangles.y - at_target_yaw)) > 30.f)
+			return ResolveStand(data, record);
 
-	// next up mark this record with a resolver mode that will be used.
-	SetMode(record);
+		record->m_eye_angles.y = (math::NormalizedAngle(viewangles.y - at_target_yaw) > 0) ? at_target_yaw + 90.f : at_target_yaw - 90.f;
 
-	// we arrived here we can do the acutal resolve.
-	if (record->m_mode == Modes::RESOLVE_WALK)
-		ResolveWalk(data, record);
+		//return UTILS::GetLBYRotatedYaw(entity->m_flLowerBodyYawTarget(), (math::NormalizedAngle(viewangles.y - at_target_yaw) > 0) ? at_target_yaw + 90.f : at_target_yaw - 90.f);
 
-	else if (record->m_mode == Modes::RESOLVE_STAND)
-		ResolveStand(data, record);
+		record->m_mode = Modes::RESOLVE_OVERRIDE;
+	}
 
-	else if (record->m_mode == Modes::RESOLVE_AIR)
-		ResolveAir(data, record);
+	bool did_lby_flick{ false };
 
-	// normalize the eye angles, doesn't really matter but its clean.
-	math::NormalizeAngle(record->m_eye_angles.y);
+	if (data->m_body != data->m_old_body)
+	{
+		record->m_eye_angles.y = record->m_body;
+
+		data->m_body_update = record->m_anim_time + 1.1f;
+
+		iPlayers[record->m_player->index()] = false;
+		record->m_mode = Modes::RESOLVE_LAST_LBY;
+	}
+	else
+	{
+		// LBY SHOULD HAVE UPDATED HERE.
+		if (record->m_anim_time >= data->m_body_update) {
+			// only shoot the LBY flick 3 times.
+			// if we happen to miss then we most likely mispredicted
+			if (data->m_body_index < 1) {
+				// set angles to current LBY.
+				record->m_eye_angles.y = record->m_body;
+
+				data->m_body_update = record->m_anim_time + 1.1f;
+
+				// set the resolve mode.
+				iPlayers[record->m_player->index()] = false;
+				record->m_mode = Modes::RESOLVE_LAST_LBY;
+			}
+		}
+	}
 }
 
 void Resolver::ResolveWalk(AimPlayer* data, LagRecord* record) {
 	// apply lby to eyeangles.
-	record->m_eye_angles.y = record->m_body;
+	if (data->m_missed_shots > 4 && data->m_missed_shots < 8) {
+		AntiFreestand(record); // Fuck this shit throw that retards head behind the wall
+		record->m_mode = RESOLVE_WALK;
+		data->resolver_mode = XOR("WALKING ANTIFREESTAND");
+	}
+	else {
+		record->m_eye_angles.y = record->m_body;
+		record->m_mode = RESOLVE_WALK;
+		data->resolver_mode = XOR("WALKING");
+	}
 
 	// delay body update.
 	data->m_body_update = record->m_anim_time + 0.22f;
@@ -262,11 +337,66 @@ void Resolver::ResolveWalk(AimPlayer* data, LagRecord* record) {
 	data->m_stand_index2 = 0;
 	data->m_body_index = 0;
 	data->m_freestanding_index = 0;
+	data->m_lby_delta_index = 0;
 
-	record->m_resolver_mode = "LBY";
 	// copy the last record that this player was walking
 	// we need it later on because it gives us crucial data.
 	std::memcpy(&data->m_walk_record, record, sizeof(LagRecord));
+}
+
+bool CheckSequence(Player* player, int sequence, bool checklayers = false, int layerstocheck = 15) //decent check could be improved - stolen from cthulhu (sopmk)
+{
+	// sanity pls
+	if (!player || !player->alive())
+		return false;
+
+	for (int i = 0; i < checklayers ? layerstocheck : 15; i++) //Check layers
+	{
+		auto layer = player->m_AnimOverlay()[i];
+
+		if (player->GetSequenceActivity(layer.m_sequence) == sequence) //Check for sequence 
+			return true;
+	}
+
+	return false; // well this uh 
+}
+
+bool CheckLBY(Player* player, LagRecord* record, LagRecord* prev_record) // I would recommend a sequence check -LoOsE (note from sopmk: sequence checks arent always effective, as some lby breakers suppress 979, hence why i'm checking animation values too)
+{
+	if (player->m_vecVelocity().length_2d() > 1.1f)
+		return false; // cant break here
+
+	bool choking = fabs(player->m_flSimulationTime() - player->m_flOldSimulationTime()) > g_csgo.m_globals->m_interval;
+
+	for (int i = 0; i < 13; i++)
+	{
+		auto layer = record->m_layers[i];
+		auto prev_layer = prev_record->m_layers[i];
+
+		// make sure that the animation happened
+		if (layer.m_cycle != prev_layer.m_cycle)
+		{
+			if (layer.m_cycle > 0.9 || layer.m_weight == 1.f) // triggered layer
+			{
+				if (i == 3) // adjust layer sanity check. If it is the adjust layer, they are most likely breaking LBY
+					return true;
+
+				// lby flick lol!
+				if (choking && fabs(math::NormalizedAngle(record->m_body - prev_record->m_body)) > 5.f)
+					return true;
+			}
+			else if (choking) // for improper LBY breakers
+			{
+				if (player->GetSequenceActivity(layer.m_sequence) == 979)
+				{
+					if (player->GetSequenceActivity(prev_layer.m_sequence) == 979)
+					{
+						return true; // we can be pretty sure that they are breaking LBY
+					}
+				}
+			}
+		}
+	}
 }
 
 void Resolver::ResolveStand(AimPlayer* data, LagRecord* record) {
@@ -301,7 +431,7 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record) {
 		record->m_eye_angles.y = data->m_body;
 
 		data->m_body_update = record->m_anim_time + 1.1f;
-
+		iPlayers[record->m_player->index()] = false;
 		record->m_mode = Modes::RESOLVE_LBY_UPDATE;
 		record->m_resolver_mode = "LBY UPDATE";
 	}
@@ -323,19 +453,19 @@ void Resolver::ResolveStand(AimPlayer* data, LagRecord* record) {
 	{
 		switch (data->m_stand_index2 % 4)
 		{
-		case 1:
+		case 0:
 			record->m_eye_angles.y = away + 180;
 			break;
 
-		case 2:
+		case 1:
 			record->m_eye_angles.y = away - 110;
 			break;
 
-		case 3:
+		case 2:
 			record->m_eye_angles.y = away + 110;
 			break;
 
-		case 4:
+		case 3:
 			record->m_eye_angles.y = away;
 			break;
 		}
