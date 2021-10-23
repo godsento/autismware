@@ -2,6 +2,11 @@
 
 HVH g_hvh{ };;
 
+void HVH::PostProcess() {
+	static auto mat_postprocess_enable = g_csgo.m_cvar->FindVar(HASH("mat_postprocess_enable"));
+	mat_postprocess_enable->SetValue(XOR("0"));
+}
+
 void HVH::IdealPitch() {
 	CCSGOPlayerAnimState* state = g_cl.m_local->m_PlayerAnimState();
 	if (!state)
@@ -11,24 +16,23 @@ void HVH::IdealPitch() {
 }
 
 void HVH::AntiAimPitch() {
-	static auto mat_postprocess_enable = g_csgo.m_cvar->FindVar(HASH("mat_postprocess_enable"));
 	switch (m_pitch) {
 	case 1:
 		// down.
+		PostProcess();
 		g_cl.m_cmd->m_view_angles.x = 89.f;
-		mat_postprocess_enable->SetValue(XOR("0"));
 		break;
 
 	case 2:
 		// up.
+		PostProcess();
 		g_cl.m_cmd->m_view_angles.x = -89.f;
-		mat_postprocess_enable->SetValue(XOR("0"));
 		break;
 
 	case 3:
 		// ideal.
+		PostProcess();
 		IdealPitch();
-		mat_postprocess_enable->SetValue(XOR("0"));
 		break;
 
 	default:
@@ -747,12 +751,15 @@ void HVH::DoRealAntiAim() {
 
 				// jitter.
 			case 2: {
-
 				// get the range from the menu.
-				float range = m_jitter_range / 2.f;
-
+				float range = m_jitter_range;
+				static bool switcher = false;
 				// set angle.
-				g_cl.m_cmd->m_view_angles.y += g_csgo.RandomFloat(-range, range);
+				if (switcher)
+				g_cl.m_cmd->m_view_angles.y += range;
+			else
+				g_cl.m_cmd->m_view_angles.y -= range;
+			switcher = !switcher;
 				break;
 			}
 
@@ -766,7 +773,6 @@ void HVH::DoRealAntiAim() {
 
 				break;
 			}
-
 				  // random.
 			case 4:
 				// check update time.
@@ -826,14 +832,15 @@ void HVH::DoFakeAntiAim() {
 
 		// relative jitter.
 	case 3: {
-		// get fake jitter range from menu.
-		float range = g_menu.main.antiaim.fake_jitter_range.get() / 2.f;
-
-		// set base to opposite of direction.
-		g_cl.m_cmd->m_view_angles.y = m_direction + 180.f;
-
-		// apply jitter.
-		g_cl.m_cmd->m_view_angles.y += g_csgo.RandomFloat(-range, range);
+		// get the range from the menu.
+		float range = g_menu.main.antiaim.fake_jitter_range.get();
+		static bool switcher = false;
+		// set angle.
+		if (switcher)
+			g_cl.m_cmd->m_view_angles.y += range;
+		else
+			g_cl.m_cmd->m_view_angles.y -= range;
+		switcher = !switcher;
 		break;
 	}
 
@@ -848,18 +855,14 @@ void HVH::DoFakeAntiAim() {
 		g_cl.m_cmd->m_view_angles.y = g_csgo.RandomFloat(-180.f, 180.f);
 		break;
 
-		// local view.
-	case 6:
-		g_cl.m_cmd->m_view_angles.y = g_cl.m_view_angles.y;
-		break;
 
 		// spin.
-	case 7:
+	case 6:
 		g_cl.m_cmd->m_view_angles.y = m_direction + 90.f + std::fmod(g_csgo.m_globals->m_curtime * -360.f, 360.f);
 		break;
 
 		// breaker 90.
-	case 8: {
+	case 7: {
 		static bool switcher = false;
 		g_cl.m_cmd->m_view_angles.y = m_direction - 180.f;
 		if (switcher)
@@ -869,10 +872,9 @@ void HVH::DoFakeAntiAim() {
 		switcher = !switcher;
 		break; }
 
-		  // rotate break.
-	case 9: {
+		  // break.
+	case 8: {
 		static bool switcher = false;
-		g_cl.m_cmd->m_view_angles.y += std::fmod(g_csgo.m_globals->m_curtime * (m_rot_speed * 100.f), m_rot_range * 360.f);
 		g_cl.m_cmd->m_view_angles.y += g_csgo.RandomFloat(-90.f, 90.f);
 		if (switcher)
 			g_cl.m_cmd->m_view_angles.y += 75;
