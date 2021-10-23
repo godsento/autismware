@@ -23,10 +23,9 @@ public:
 
 	void OnBodyUpdate(Player* player, float value);
 	float GetAwayAngle(LagRecord* record);
-
 	void MatchShot(AimPlayer* data, LagRecord* record);
+	void ResolveOverride(Player* player, LagRecord* record, AimPlayer* data);
 	void SetMode(LagRecord* record);
-
 	void ResolveAngles(Player* player, LagRecord* record);
 	void ResolveWalk(AimPlayer* data, LagRecord* record);
 	void ResolveStand(AimPlayer* data, LagRecord* record);
@@ -36,15 +35,11 @@ public:
 	void AirNS(AimPlayer* data, LagRecord* record);
 	void AntiFreestand(LagRecord* record);
 	void ResolvePoses(Player* player, LagRecord* record);
-	bool Spin_Detection(AimPlayer* data);
-
-	float spindelta;
-	float spinbody;
-	int spin_step;
 
 public:
 	std::array< vec3_t, 64 > m_impacts;
 	std::string resolver_mode = "";
+	int	   iPlayers[64];
 };
 
 extern Resolver g_resolver;
